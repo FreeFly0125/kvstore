@@ -5,12 +5,13 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api_route import api_router
 from app.db.dbconnect import Base, engine
+from app.api.error import APIException
 import app.db.schemas
 
 load_dotenv()
 
 
-async def lifespan(app: FastAPI):
+def lifespan(app: FastAPI):
     print("DB connecting ...")
     Base.metadata.create_all(bind=engine)
     print("Server starting ...")
@@ -28,12 +29,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router)
+app.include_router(api_router, prefix="/api")
 
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
+def http_exception_handler(request, exc):
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+
+
+@app.exception_handler(APIException)
+def api_exception_handler(request, error: APIException):
+    return error.getResponse()

@@ -2,7 +2,7 @@ from app.db.dbconnect import Base
 from sqlalchemy import Column, Integer, String, Date, JSON
 
 
-class Tenants(Base):
+class TenantSchema(Base):
     __tablename__ = "Tenant"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -10,10 +10,10 @@ class Tenants(Base):
     name = Column(String, nullable=False)
     capSize = Column(Integer, nullable=False)
     curCount = Column(Integer, nullable=False)
-    ttl = Column(Integer, nullable=False)
+    dataTtl = Column(Integer, nullable=False)
 
 
-class Objects(Base):
+class ObjectSchema(Base):
     __tablename__ = "Object"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
