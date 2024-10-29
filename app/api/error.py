@@ -30,3 +30,26 @@ class TenantNotFoundException(APIException):
         super(TenantNotFoundException, self).__init__(
             status_code=400, message="The tenant with the name is not exist"
         )
+
+
+class InvalidTokenException(APIException):
+    def __init__(self):
+        super(InvalidTokenException, self).__init__(
+            status_code=403, message="Token is invalid"
+        )
+
+
+class DataNotExistException(APIException):
+    def __init__(self):
+        super(DataNotExistException, self).__init__(
+            status_code=404,
+            message="Data with the id is not existing within the tenant",
+        )
+
+
+class BatchInsertFailException(APIException):
+    def __init__(self):
+        super(BatchInsertFailException, self).__init__(
+            status_code=404,
+            message="Data batch insertion is failed. The status is rollbacked.",
+        )

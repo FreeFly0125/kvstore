@@ -23,7 +23,7 @@ def get_single_tenant_with_tid(tid: str):
             dbHandler.query(TenantSchema).filter(TenantSchema.tenantID == tid).first()
         )
         return tenant if tenant else False
-    except Exception as e:
+    except Exception:
         return False
 
 

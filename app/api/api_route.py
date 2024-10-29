@@ -11,4 +11,4 @@ def health_check():
 
 
 api_router.include_router(tenant_route, prefix="/tenant")
-api_router.include_router(object_route, prefix="/object")
+api_router.include_router(object_route)
