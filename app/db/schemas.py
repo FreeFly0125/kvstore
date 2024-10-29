@@ -1,5 +1,5 @@
 from app.db.dbconnect import Base
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, JSON
 
 
 class Tenants(Base):
@@ -13,12 +13,12 @@ class Tenants(Base):
     ttl = Column(Integer, nullable=False)
 
 
-class Tenants(Base):
-    __tablename__ = "Datastore"
+class Objects(Base):
+    __tablename__ = "Object"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     tenantID = Column(String, nullable=False)
     key = Column(String, nullable=False)
-    value = Column(Integer, nullable=False)
+    value = Column(JSON, nullable=False)
     curCount = Column(Integer, nullable=False)
     created = Column(Date, nullable=False)
