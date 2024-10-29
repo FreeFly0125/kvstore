@@ -24,7 +24,6 @@ def get_single_tenant_with_tid(tid: str):
         )
         return tenant if tenant else False
     except Exception as e:
-        print("error:", e)
         return False
 
 
@@ -35,7 +34,6 @@ def insert_new_tenant(tenant: TenantModel, tid: str):
             name=tenant.name,
             capSize=tenant.cap_limit,
             curCount=0,
-            dataTtl=tenant.data_ttl,
         )
         dbHandler.add(new_tenant)
         dbHandler.commit()

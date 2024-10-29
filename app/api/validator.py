@@ -2,7 +2,7 @@ from functools import wraps
 from app.api import error
 
 required_fields = {
-    "tenant_register": ["name", "cap_limit", "data_ttl"],
+    "tenant_register": ["name", "cap_limit"],
     "tenant_login": ["name"],
 }
 

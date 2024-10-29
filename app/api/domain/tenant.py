@@ -42,9 +42,7 @@ def tenant_sign_in(tenant: TenantModel):
     if not tenant_info:
         raise error.TenantNotFoundException()
     payload = {
-        "tenant_name": tenant_info.name,
         "tenant_id": tenant_info.tenantID,
-        "data_ttl": tenant_info.dataTtl,
         "exp": time.time() + 60 * 30,
     }
     token = jwt.encode(payload=payload, key=secret_key, algorithm="HS256")
