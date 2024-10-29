@@ -111,6 +111,14 @@ class DataFetchFailException(APIException):
         )
 
 
+class DataExpiredException(APIException):
+    def __init__(self):
+        super(DataExpiredException, self).__init__(
+            status_code=410,
+            message="Key is expired.",
+        )
+
+
 class DataRemoveFailException(APIException):
     def __init__(self, description):
         super(DataRemoveFailException, self).__init__(

@@ -34,11 +34,11 @@ def get_data_info(key: str, tid: str):
             tenant.curCount -= 1
 
             dbHandler.commit()
-            return None
+            raise error.DataExpiredException()
 
         return data_obj
     except Exception as e:
-        return error.DataFetchFailException(e.message)
+        raise error.DataFetchFailException(e.message)
 
 
 def insert_new_data(info: ObjectModel, tenant_id: str = None):
@@ -68,7 +68,7 @@ def insert_new_data(info: ObjectModel, tenant_id: str = None):
         return True
     except Exception as e:
         dbHandler.rollback()
-        return error.DataInsertFailException(e.message)
+        raise error.DataInsertFailException(e.message)
 
 
 def batch_insert_data(infos: List[ObjectModel], tenant_id: str = None):
