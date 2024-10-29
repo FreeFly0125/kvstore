@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api_route import api_router
 from app.db.dbconnect import Base, engine
+import app.db.schemas
 
 load_dotenv()
 
