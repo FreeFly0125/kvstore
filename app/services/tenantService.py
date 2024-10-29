@@ -1,6 +1,7 @@
 from app.db.dbconnect import SessionLocal
 from app.db.schemas import TenantSchema
 from app.models.tenant import TenantModel
+from app.api import error
 
 dbHandler = SessionLocal()
 
@@ -12,9 +13,11 @@ def get_all_tenants():
 def get_single_tenant_with_name(name: str):
     try:
         tenant = dbHandler.query(TenantSchema).filter(TenantSchema.name == name).first()
-        return tenant if tenant else False
+        if not tenant:
+            raise error.TenantNotFoundException()
+        return tenant
     except Exception:
-        return False
+        raise error.TenantNotFoundException()
 
 
 def get_single_tenant_with_tid(tid: str):
@@ -22,9 +25,11 @@ def get_single_tenant_with_tid(tid: str):
         tenant = (
             dbHandler.query(TenantSchema).filter(TenantSchema.tenantID == tid).first()
         )
-        return tenant if tenant else False
+        if not tenant:
+            raise error.TenantNotFoundException()
+        return tenant
     except Exception:
-        return False
+        raise error.TenantNotFoundException()
 
 
 def insert_new_tenant(tenant: TenantModel, tid: str):
@@ -38,8 +43,8 @@ def insert_new_tenant(tenant: TenantModel, tid: str):
         dbHandler.add(new_tenant)
         dbHandler.commit()
         return True
-    except Exception:
-        return False
+    except Exception as e:
+        raise error.TenantRegisterFailException(e.message)
 
 
 def delete_tenant(tid: str):
@@ -52,6 +57,6 @@ def delete_tenant(tid: str):
             dbHandler.commit()
             return True
         else:
-            return False
-    except Exception:
-        return False
+            raise error.TenantNotFoundException()
+    except Exception as e:
+        raise error.TenantDeleteFailException(e.message)

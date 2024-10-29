@@ -11,24 +11,24 @@ import uuid
 dbHandler = SessionLocal()
 
 
-def get_data_info(oid: str, tid: str):
+def get_data_info(key: str, tid: str):
     try:
         data_obj = (
             dbHandler.query(ObjectSchema)
-            .filter(and_(ObjectSchema.objectID == oid, ObjectSchema.tenantID == tid))
+            .filter(and_(ObjectSchema.key == key, ObjectSchema.tenantID == tid))
             .first()
         )
         if not data_obj:
             raise error.DataNotExistException()
         return data_obj
     except Exception:
-        return False
+        raise error.DataNotExistException()
 
 
 def insert_new_data(info: ObjectModel, tenant_id: str = None):
     object_id = uuid.uuid4()
     created = datetime.datetime.now()
-    expired = created + datetime.timedelta(hours=info.ttl)
+    expired = created + datetime.timedelta(seconds=info.ttl)
 
     try:
         new_obj = ObjectSchema(
@@ -42,8 +42,8 @@ def insert_new_data(info: ObjectModel, tenant_id: str = None):
         dbHandler.add(new_obj)
         dbHandler.commit()
         return True
-    except Exception:
-        return False
+    except Exception as e:
+        return error.DataInsertFailException(e.message)
 
 
 def batch_insert_data(infos: List[ObjectModel], tenant_id: str = None):
@@ -51,7 +51,7 @@ def batch_insert_data(infos: List[ObjectModel], tenant_id: str = None):
     for info in infos:
         object_id = uuid.uuid4()
         created = datetime.datetime.now()
-        expired = created + datetime.timedelta(hours=info.ttl)
+        expired = created + datetime.timedelta(seconds=info.ttl)
 
         new_obj = ObjectSchema(
             objectID=object_id,
@@ -67,16 +67,16 @@ def batch_insert_data(infos: List[ObjectModel], tenant_id: str = None):
         dbHandler.add_all(objects_to_insert)
         dbHandler.commit()
         return True
-    except Exception:
+    except Exception as e:
         dbHandler.rollback()
-        raise error.BatchInsertFailException()
+        raise error.BatchInsertFailException(e.message)
 
 
-def delete_data_info(oid: str, tid: str):
+def delete_data_info(key: str, tid: str):
     try:
         data_obj = (
             dbHandler.query(ObjectSchema)
-            .filter(and_(ObjectSchema.objectID == oid, ObjectSchema.tenantID == tid))
+            .filter(and_(ObjectSchema.key == key, ObjectSchema.tenantID == tid))
             .first()
         )
         if not data_obj:
@@ -84,5 +84,5 @@ def delete_data_info(oid: str, tid: str):
         dbHandler.delete(data_obj)
         dbHandler.commit()
         return True
-    except Exception:
-        return False
+    except Exception as e:
+        raise error.DataRemoveFailException(e.message)
