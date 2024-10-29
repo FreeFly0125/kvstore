@@ -36,4 +36,14 @@ All the objects APIs are involving JWT token generated after sign in as one tena
 
 ## Run the service
 
-Main commands are written in make script. You can run the application with command `make run`
+1. Install Python, and PostgreSQL
+
+2. Install dependencies
+
+   You install required modules from `requirements.txt`.
+
+3. Run the application
+
+   With simple make script, ou can run the application with command `make run`.
+
+   Else, you can run `uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload`
