@@ -13,11 +13,9 @@ def get_all_tenants():
 def get_single_tenant_with_name(name: str):
     try:
         tenant = dbHandler.query(TenantSchema).filter(TenantSchema.name == name).first()
-        if not tenant:
-            raise error.TenantNotFoundException()
         return tenant
     except Exception:
-        raise error.TenantNotFoundException()
+        raise error.TenantFetchFailException()
 
 
 def get_single_tenant_with_tid(tid: str):
@@ -25,11 +23,9 @@ def get_single_tenant_with_tid(tid: str):
         tenant = (
             dbHandler.query(TenantSchema).filter(TenantSchema.tenantID == tid).first()
         )
-        if not tenant:
-            raise error.TenantNotFoundException()
         return tenant
     except Exception:
-        raise error.TenantNotFoundException()
+        raise error.TenantFetchFailException()
 
 
 def insert_new_tenant(tenant: TenantModel, tid: str):
@@ -60,3 +56,15 @@ def delete_tenant(tid: str):
             raise error.TenantNotFoundException()
     except Exception as e:
         raise error.TenantDeleteFailException(e.message)
+
+
+def get_current_capacity(tid: str):
+    try:
+        tenant = (
+            dbHandler.query(TenantSchema).filter(TenantSchema.tenantID == tid).first()
+        )
+        if not tenant:
+            raise error.TenantNotFoundException()
+        return (tenant.capSize, tenant.curCount)
+    except Exception as e:
+        raise error.TenantCapacityFailException(e.message)

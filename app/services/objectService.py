@@ -1,5 +1,5 @@
 from app.db.dbconnect import SessionLocal
-from app.db.schemas import ObjectSchema
+from app.db.schemas import ObjectSchema, TenantSchema
 from app.models.object import ObjectModel
 from app.api import error
 
@@ -18,11 +18,27 @@ def get_data_info(key: str, tid: str):
             .filter(and_(ObjectSchema.key == key, ObjectSchema.tenantID == tid))
             .first()
         )
+
         if not data_obj:
-            raise error.DataNotExistException()
+            return None
+
+        time_now = datetime.datetime.now()
+        if data_obj.expired < time_now:
+            dbHandler.delete(data_obj)
+
+            tenant = (
+                dbHandler.query(TenantSchema)
+                .filter(TenantSchema.tenantID == tid)
+                .first()
+            )
+            tenant.curCount -= 1
+
+            dbHandler.commit()
+            return None
+
         return data_obj
-    except Exception:
-        raise error.DataNotExistException()
+    except Exception as e:
+        return error.DataFetchFailException(e.message)
 
 
 def insert_new_data(info: ObjectModel, tenant_id: str = None):
@@ -40,9 +56,18 @@ def insert_new_data(info: ObjectModel, tenant_id: str = None):
             expired=expired,
         )
         dbHandler.add(new_obj)
+
+        tenant = (
+            dbHandler.query(TenantSchema)
+            .filter(TenantSchema.tenantID == tenant_id)
+            .first()
+        )
+        tenant.curCount += 1
+
         dbHandler.commit()
         return True
     except Exception as e:
+        dbHandler.rollback()
         return error.DataInsertFailException(e.message)
 
 
@@ -65,6 +90,14 @@ def batch_insert_data(infos: List[ObjectModel], tenant_id: str = None):
 
     try:
         dbHandler.add_all(objects_to_insert)
+
+        tenant = (
+            dbHandler.query(TenantSchema)
+            .filter(TenantSchema.tenantID == tenant_id)
+            .first()
+        )
+        tenant.curCount += len(infos)
+
         dbHandler.commit()
         return True
     except Exception as e:
@@ -82,6 +115,12 @@ def delete_data_info(key: str, tid: str):
         if not data_obj:
             raise error.DataNotExistException()
         dbHandler.delete(data_obj)
+
+        tenant = (
+            dbHandler.query(TenantSchema).filter(TenantSchema.tenantID == tid).first()
+        )
+        tenant.curCount -= 1
+
         dbHandler.commit()
         return True
     except Exception as e:

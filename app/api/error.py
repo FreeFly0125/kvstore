@@ -43,7 +43,7 @@ class DataNotExistException(APIException):
     def __init__(self):
         super(DataNotExistException, self).__init__(
             status_code=404,
-            message="Data with the id is not existing within the tenant",
+            message="Data with the key is not existing within the tenant",
         )
 
 
@@ -116,4 +116,28 @@ class DataRemoveFailException(APIException):
         super(DataRemoveFailException, self).__init__(
             status_code=500,
             message=f"Removing data object is failed. {description}",
+        )
+
+
+class TenantCapacityFailException(APIException):
+    def __init__(self, description):
+        super(TenantCapacityFailException, self).__init__(
+            status_code=500,
+            message=f"Fetching capacity info is failed. {description}",
+        )
+
+
+class CapacityFilledException(APIException):
+    def __init__(self):
+        super(CapacityFilledException, self).__init__(
+            status_code=507,
+            message="Capacity is already filled.",
+        )
+
+
+class InsufficientCapacityException(APIException):
+    def __init__(self):
+        super(InsufficientCapacityException, self).__init__(
+            status_code=507,
+            message="Capacity is insufficient.",
         )
